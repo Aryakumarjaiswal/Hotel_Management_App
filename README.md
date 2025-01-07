@@ -35,7 +35,10 @@ A Streamlit-based intelligent chatbot application that provides property-specifi
 bash git clone <repository-url>
 
 
-2. Install required packages:
+# Example README
 
-bash
-pip install -r requirements.txt
+Hover over the code below to copy the link:
+
+```plaintext
+https://example.com
+
