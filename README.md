@@ -30,15 +30,12 @@ A Streamlit-based intelligent chatbot application that provides property-specifi
 - Required Python packages (see requirements.txt)
 
 ## Installation
-
 ```plaintext
 git clone <repository-url>
 
 
-# Example README
-
-Hover over the code below to copy the link:
-
+2. Install required packages:
 ```plaintext
-https://example.com
+pip install -r requirements.txt
+
 
