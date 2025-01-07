@@ -31,8 +31,8 @@ A Streamlit-based intelligent chatbot application that provides property-specifi
 
 ## Installation
 
-
-bash git clone <repository-url>
+```plaintext
+git clone <repository-url>
 
 
 # Example README
