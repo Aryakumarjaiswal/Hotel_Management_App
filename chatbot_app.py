@@ -28,7 +28,7 @@ def transfer_to_customer_service():
         logging.info(message)  # Log the message
         print(message)
         return message
-GEMINI_API_KEY = "AIzaSyCdfguznhfW90qvKx-lTUus8_ODQsGM3nk"
+GEMINI_API_KEY = "AIzas8_ODQsGM3nk"
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Define generation configuration
