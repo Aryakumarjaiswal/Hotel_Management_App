@@ -30,41 +30,52 @@ A Streamlit-based intelligent chatbot application that provides property-specifi
 - Required Python packages (see requirements.txt)
 
 ## Installation
+1. Clone the Repository
+```plaintext
 git clone <repository-url>
+```
 
 
 
-## Install required packages:
+2. Install required packages:
+```plaintext
 pip install -r requirements.txt
+```
 
-
-## Set up MySQL database and update the connection string in `Database.py`:
-Before Executing below make sure you create Conversations database in your MySQL Workbench
+3. Set up MySQL database and update the connection string in `Database.py`:
+Before Executing code with below make sure you create Conversations database in your MySQL Workbench
+```plaintext
 DATABASE_URL = "mysql+pymysql://username:password@localhost:3306/Conversations"
-
-## Configure your Gemini API key in `chatbot_app.py`:
+```
+4. Configure your Gemini API key in `chatbot_app.py`:
+```plaintext
 GEMINI_API_KEY = "your-api-key-here"
+```
 
 
-## Database Schema
+5. Database Schema
 
 The application uses three main tables:
 
-1. **Session_table_2**
+a. **Session_table_2**
    - Tracks user sessions
    - Stores session duration and status
    - Links to chat history and transfers
 
-2. **Chat_table**
+b. **Chat_table**
    - Stores all chat messages
    - Tracks message status and timestamp
    - Links messages to sessions
 
-3. **chat_transfer_table**
+c. **chat_transfer_table**
    - Manages customer service transfers
    - Records transfer reasons and timestamps
    - Links transfers to sessions
 
+6.Run the application
+```plaintext
+streamlit run chatbot_app.py
+```
 ## Usage
 
 1. Start the application:
@@ -102,10 +113,6 @@ streamlit run chatbot_app.py
 - Conversation history storage
 - Session duration tracking
 - Property-specific context retrieval via ChromaDB
-
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## License
 
