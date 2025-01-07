@@ -33,3 +33,9 @@ A Streamlit-based intelligent chatbot application that provides property-specifi
 
 
 bash git clone <repository-url>
+
+
+2. Install required packages:
+
+bash
+pip install -r requirements.txt
