@@ -37,11 +37,13 @@ git clone <repository-url>
 
 
 
-2. Install required packages:
+2(a). Install required packages:
 ```plaintext
 pip install -r requirements.txt
 ```
 
+2(b). Create Chunck by running test.ipynb
+   
 3. Set up MySQL database and update the connection string in `Database.py`:
 Before Executing code with below make sure you create Conversations database in your MySQL Workbench
 ```plaintext
