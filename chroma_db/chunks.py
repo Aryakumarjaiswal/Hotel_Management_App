@@ -1,7 +1,7 @@
 import pandas as pd
 import json
 import chromadb
-df = pd.read_csv('units_info.csv')  
+df = pd.read_csv(r'Neovis-Registered-User-App\units_info.csv')  
 def parse_notes(note):
     try:
         parsed = json.loads(note)  # Parse JSON safely
@@ -30,7 +30,7 @@ max_length = lengths.max()
 df['combined_info'] = df.apply(lambda row: '\n'.join([f"{col}: {row[col]}" for col in df.columns]), axis=1)
 df['id'] = df['id'].astype(str)
 
-client = chromadb.PersistentClient(path='./UNITS_INFO_CHUNCK')
+client = chromadb.PersistentClient(path='UNITS_INFO_CHUNCK')
 
 # Function to chunk text
 def chunk_text(text, chunk_size=100):
