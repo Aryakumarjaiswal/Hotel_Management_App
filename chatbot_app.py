@@ -29,7 +29,7 @@ def transfer_to_customer_service():
         print(message)
         return message
 try:
-   GEMINI_API_KEY = "AIzas8_ODQsGM3nk"
+   GEMINI_API_KEY ="AIzaSyCdfguznhfW90qvKx-lTUus8_ODQsGM3nk"
    genai.configure(api_key=GEMINI_API_KEY)
 except Exception as e:
    raise f"API KEY ERROR:{e}"
@@ -114,7 +114,7 @@ async def login_user(email, password):
         st.sidebar.error(f"Error during login: {str(e)}")
         return None
 
-client = chromadb.PersistentClient(path=r"chroma_db\UNITS_INFO_CHUNCK")
+client = chromadb.PersistentClient(path=r"C:\Users\ARYAN\OneDrive\Desktop\APP_TEST\UNITS_INFO_CHUNCK")#HAYAN C:\Users\ARYAN\OneDrive\Desktop\APP_TEST\ ko absolute path se replace karo 
 def validate_collection_id(collection_id: str) -> bool:
     """Validates if a collection ID exists in ChromaDB."""
     try:
