@@ -6,7 +6,7 @@ from sqlalchemy import (
 )
 import uuid
 from sqlalchemy.dialects.mysql import CHAR
-DATABASE_URL = "mysql+pymysql://root:#1Krishna@localhost:3306/Conversations"
+DATABASE_URL = "mysql+pymysql://root:db_password@localhost:3306/Conversations"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
