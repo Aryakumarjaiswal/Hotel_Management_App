@@ -7,8 +7,8 @@ from datetime import datetime
 def create_database_and_table(data):
     conn = pymysql.connect(
         host="localhost",
-        user="root",  
-        password="#1Krishna",  
+        user="username",  
+        password="db password",  
         database="Conversations"  
     )
     cursor = conn.cursor()
