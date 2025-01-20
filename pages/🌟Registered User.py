@@ -16,6 +16,13 @@ import uuid
 import os
 
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[logging.FileHandler('Registered_User.log'), logging.StreamHandler()],
+)
+
+logging.info("Doing Database Configuration...")
 db = SessionLocal()
 def get_db():
    
@@ -23,21 +30,26 @@ def get_db():
         yield db
     finally:
         db.close()
+logging.info("Database Configuration Done")        
 def transfer_to_customer_service():
+        
         """Simulates transferring the chat to the customer service team."""
+        logging.info("Inside the transfer_to_customer_service")
         message = """Sure I'm transferring your call to the customer service team. Please wait a moment.
         Call transferred to the customer service team successfully!!!!"""
         logging.info(message)  # Log the message
         print(message)
+        logging.info("Returning the message from transfer_to_customer_service")
         return message
 
-
+logging.info("Doing Gemini Configuration...")
 load_dotenv()
 GEMINI_API_KEY =os.getenv('GEMINI_KEY') # Replace with your API key
 if not GEMINI_API_KEY:
+        logging.info(" GEMINI_API_KEY variable not found...")
         raise ValueError("GEMINI_KEY environment variable is not set")
 genai.configure(api_key=GEMINI_API_KEY)
-
+logging.info("Gemini Key Done!!")
 # Define generation configuration
 generation_config = {
     "temperature": 1,
@@ -90,6 +102,7 @@ model = genai.GenerativeModel(
 chat = model.start_chat()
 async def login_user(email, password):
     try:
+        logging.info("Inside the External API Calling function")
         API_BASE_URL = "https://shark-app-6wiyn.ondigitalocean.app/api"
         login_url = f"{API_BASE_URL}/v1/auth/login"
         async with httpx.AsyncClient() as client:
@@ -106,9 +119,10 @@ async def login_user(email, password):
             )
             
             if response.status_code != 201:
+                logging.info("Response statuse code is not 201")
                 st.sidebar.error(f"Login failed. Please enter correct details. Status code: {response.status_code}")
                 return None
-            
+            logging.info("Response statuse code is 201 !!")
             data = response.json()
             user_id = data["user"]["id"]
             user_role = data["user"]["user_role"]["role"]
@@ -125,30 +139,39 @@ async def login_user(email, password):
                 Duration=None
                 
             )
-            
+            logging.info("Inserting Value to session Table")
             db.add(new_session)
             db.commit()
-            
+            logging.info("Inserted Value is commited to session Table")
             # Add session_id to the returned data
             #data['session_id'] = session_id
             return user_id,user_role,session_id
 
     except Exception as e:
+        logging.info("Invalid Credential!!")
         st.sidebar.error(f"Error during login: {str(e)}")
         return None
-
+logging.info("Establishing chromadb persistant client...")
 client = chromadb.PersistentClient(path=r"chroma_db\UNITS_INFO_CHUNCK")
+logging.info("Established chromadb persistant client")
 def validate_collection_id(collection_id: str) -> bool:
     """Validates if a collection ID exists in ChromaDB."""
+    logging.info("Inside the validate_collection_id funtion")
     try:
+
+
         collection = client.get_collection("collection_" + collection_id)
+        logging.info("Property ID is valid!!")
         return True
     except Exception:
         logging.error(f"Collection ID {collection_id} not found.")
         return False
 def retrieve_chunks(query, collection_name, top_k=5):
+    logging.info("Inside the retrieve_chunks function")
     try:
+        logging.info("Retrieving Collection id..")
         collection = client.get_collection("collection_" + collection_name)
+        logging.info(f"Retrieving top 5 text from collection with Collection id {collection_name} ..")
         results = collection.query(query_texts=[query], n_results=top_k)
         return " ".join(doc for doc in results["documents"][0])
     except Exception as e:
@@ -174,6 +197,7 @@ def chatbot(query, collection_name, session_id):
     for part in response.candidates[0].content.parts:
         if hasattr(part, "function_call") and part.function_call is not None and part.function_call.name == "transfer_to_customer_service":
             transfer_chat=ChatTransfer(session_id=session_id,transferred_by="bot",transfer_reason="Transfer to customer service team",transferred_at=datetime.utcnow().strftime('%Y-%m-%d %H:%M'))
+            logging.info(f"Entry made to ChatTransfer table")
             db.add(transfer_chat)
             session_record = db.query(Session_Table).filter_by(session_id=session_id).first()
             if session_record:
@@ -181,8 +205,10 @@ def chatbot(query, collection_name, session_id):
 
             db.commit()
             db.refresh(transfer_chat)
+            logging.info(f"Entry made successfully to ChatTransfer table")
             if session_record:
                 db.refresh(session_record)
+            logging.info(f"calling transfer_to_customer_service funtion....")
             return transfer_to_customer_service()
 
     return response.text
@@ -212,16 +238,20 @@ def register_main():
                     if validate_collection_id(property_id)==False:
                         return st.error("Please enter valid Property ID")
                     st.session_state.pid = property_id
+                    logging.info("property_id given to pis session variable")
                     
                     try:
 
                         user_id, user_role, session_id = asyncio.run(login_user(email, password))
+                        logging.info("user_id, user_role, session_id retrived from login_user")
                     except Exception as e:
+                        logging.error("Invalid Credential")
                         return (f"Enter Valid Credential {e}")
                     if user_id:
                         st.session_state.session_id = session_id  # Store session_id
-                        
+                        logging.info("session_id  given to session_id session variable")
                         st.session_state.logged_in = True
+                        logging.info(" logged_in session variable set to true")
                         st.sidebar.success(f"User id {user_id} Logged In Successfully!!.\nYour Session_ID: {session_id}")
                     else:
                         return st.error("Please Enter Valid Credential")
@@ -246,9 +276,12 @@ def register_main():
 
 
         if user_input:
+            logging.info(f"User entered {user_input}")
             response=chatbot(user_input,st.session_state.pid,st.session_state.session_id)
+            logging.info(session_id ,"is getting searched in Session_Table  ")
             user = db.query(Session_Table).filter_by(session_id=st.session_state.session_id).first()
             if not user:
+                logging.info(session_id ,"is not in Session_Table  ")
                 raise HTTPException(status_code=404, detail="Enter a valid session ID")
             
             #print(st.session_state.pid)
@@ -259,13 +292,16 @@ def register_main():
          f"\n USER-> {user_input}",
         f"\n RESPONSE-> {response}"
                                 }"
+            logging.info(session_id ,"is getting searched in Chat Table..  ")
             record_search=db.query(Chat).filter_by(session_id=st.session_state.session_id).first()
             if not record_search:
+                logging.info("User with",session_id,"not found")
                 first_chat=Chat(session_id=st.session_state.session_id,sender="user",message=message_container,sent_at=datetime.utcnow().strftime('%Y-%m-%d %H:%M'),status="read")
+                
                 user.ended_at = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
         
                 if user.started_at:
-
+                    logging.info("Time based enteries are happening in session table")
                     ended_at_dt = datetime.strptime(user.ended_at, '%Y-%m-%d %H:%M')
                     started_at_dt = datetime.strptime(user.started_at, '%Y-%m-%d %H:%M')
                     user.Duration = (ended_at_dt - started_at_dt).total_seconds()
@@ -277,7 +313,7 @@ def register_main():
             else :
 
         
-
+                logging.info("User allready exists")
 
                 user.ended_at = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
                 record_search.message=(record_search.message or "")+message_container
@@ -307,9 +343,5 @@ def register_main():
                 'content': response
             })
 
-
+logging.info("Calling register_main function")
 register_main()
-# import streamlit as st
-
-# pg = st.navigation([st.Page("chatbot_app.py")])
-# pg.run()
