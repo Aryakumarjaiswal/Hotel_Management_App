@@ -6,12 +6,18 @@ from sqlalchemy import (
 )
 import uuid
 from sqlalchemy.dialects.mysql import CHAR
-DATABASE_URL = "mysql+pymysql://root:db_password@localhost:3306/Conversations"
+from dotenv import load_dotenv
+import os
+load_dotenv()
+DB_PASSWORD= os.environ['DB_PASSWORD']
+DATABASE_URL = f"mysql+pymysql://root:{DB_PASSWORD}@localhost:3306/Conversations"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
+
+
 
 
 
