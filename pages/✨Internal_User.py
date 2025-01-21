@@ -29,11 +29,13 @@ Columns:
 # Configure Gemini API
 
 
-# Logging configuration
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[logging.FileHandler('chatbot.log'), logging.StreamHandler()],
+    handlers=[
+        logging.FileHandler('internal_user.log', mode='a'),
+        logging.StreamHandler()
+    ],
 )
 
 # Set up system instructions
@@ -107,8 +109,8 @@ def internal_main():
     )
     
     # Chat history initialization
-    if 'chat_history' not in st.session_state:
-        st.session_state.chat_history = []
+    if 'chat_history_int' not in st.session_state:
+        st.session_state.chat_history_int = []
 
     # Database connection
     try:
@@ -126,7 +128,7 @@ def internal_main():
 
     # Display chat history
     st.write("#### Chat History")
-    for message in st.session_state.chat_history:
+    for message in st.session_state.chat_history_int:
         if message["role"] == "user":
             st.chat_message("user").write(message["content"])
         else:
@@ -136,7 +138,7 @@ def internal_main():
     user_query = st.chat_input("Type your query here...")
     
     if user_query:
-        st.session_state.chat_history.append({"role": "user", "content": user_query})
+        st.session_state.chat_history_int.append({"role": "user", "content": user_query})
         st.chat_message("user").write(user_query)
 
         try:
@@ -153,15 +155,15 @@ def internal_main():
                 query_result = execute_sql(conn, generated_sql)
                 logging.info(f"""QUERY GENERATED->{clean_sql_query(generated_sql)}""")
                 final_response = chat_session.send_message(
-                    f"User asked: '{user_query}'. The query result is: {query_result}. Format it for user understanding."
+                    f"User asked: '{user_query}'. The query result is: {query_result}. Format it for user understanding in natural language professionaly."
                 )
                 response_text = final_response.candidates[0].content.parts[0].text
                 logging.info("Formatted response received from Gemini")
-                st.session_state.chat_history.append({"role": "assistant", "content": response_text})
+                st.session_state.chat_history_int.append({"role": "assistant", "content": response_text})
                 st.chat_message("assistant").write(response_text)
             else:
                 logging.info("Non-SQL response detected")
-                st.session_state.chat_history.append({"role": "assistant", "content": response.text})
+                st.session_state.chat_history_int.append({"role": "assistant", "content": response.text})
                 st.chat_message("assistant").write(response.text)
 
         except Exception as e:
