@@ -3,6 +3,9 @@
 
 A Streamlit-based intelligent chatbot application that provides property-specific information to registered hotel users & internal user. The application features secure authentication, conversation management, and customer service transfer capabilities.
 ![image](https://github.com/user-attachments/assets/60c2713b-2c64-44a2-9b83-8309df29659e)
+![image](https://github.com/user-attachments/assets/2276bdd9-6b7b-4493-b38d-162e07ff1d19)
+![image](https://github.com/user-attachments/assets/5a26d1f4-9905-4377-a2ed-8df347bb4846)
+
 
 
 ## Features
@@ -14,6 +17,7 @@ A Streamlit-based intelligent chatbot application that provides property-specifi
 - **Customer Service Transfer**: Seamless transfer to human agents when needed
 - **Session Management**: Tracks user sessions and conversation duration
 - **Database Integration**: MySQL backend for storing chat history and user sessions
+- **User**: For registered user asnwers questions based on property with entered property ID & to internal user asks questions from database
 
 ## Tech Stack
 
@@ -44,14 +48,19 @@ git clone <repository-url>
 pip install -r requirements.txt
 ```
 
-2(b). Create Chunck by running test.ipynb
+
+2(b). Create Chunck by running Chuncks.py
+
+
+
+2(c). Establish Database connection by running dataset_create.py
    
 3. Set up MySQL database and update the connection string in `Database.py`:
 Before Executing code with below make sure you create Conversations database in your MySQL Workbench
 ```plaintext
-DATABASE_URL = "mysql+pymysql://username:password@localhost:3306/Conversations"
+DATABASE_URL = "mysql+pymysql://db_username:db_password@localhost:3306/Conversations"
 ```
-4. Configure your Gemini API key in `chatbot_app.py`:
+4. Configure your Gemini API key in `About App.py`:
 ```plaintext
 GEMINI_API_KEY = "your-api-key-here"
 ```
@@ -75,6 +84,7 @@ c. **chat_transfer_table**
    - Manages customer service transfers
    - Records transfer reasons and timestamps
    - Links transfers to sessions
+
 
 6.Run the application
 ```plaintext
