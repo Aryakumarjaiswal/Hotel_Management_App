@@ -88,7 +88,7 @@ c. **chat_transfer_table**
 
 6.Run the application
 ```plaintext
-streamlit run chatbot_app.py
+streamlit run About app.py
 ```
 ## Usage
 
