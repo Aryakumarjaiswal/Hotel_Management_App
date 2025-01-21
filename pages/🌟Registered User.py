@@ -16,10 +16,14 @@ import uuid
 import os
 
 
+# Logging configuration
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[logging.FileHandler('Registered_User.log'), logging.StreamHandler()],
+    handlers=[
+        logging.FileHandler('registered_user.log', mode='a'), 
+        logging.StreamHandler()
+    ],
 )
 
 logging.info("Doing Database Configuration...")
@@ -49,7 +53,7 @@ if not GEMINI_API_KEY:
         logging.info(" GEMINI_API_KEY variable not found...")
         raise ValueError("GEMINI_KEY environment variable is not set")
 genai.configure(api_key=GEMINI_API_KEY)
-logging.info("Gemini Key Done!!")
+logging.info("Gemini Key founded !!")
 # Define generation configuration
 generation_config = {
     "temperature": 1,
@@ -152,7 +156,7 @@ async def login_user(email, password):
         st.sidebar.error(f"Error during login: {str(e)}")
         return None
 logging.info("Establishing chromadb persistant client...")
-client = chromadb.PersistentClient(path=r"chroma_db\UNITS_INFO_CHUNCK")
+client = chromadb.PersistentClient(path=r"C:\Users\ARYAN\OneDrive\Desktop\Deployment_Test\UNITS_INFO_CHUNCK")
 logging.info("Established chromadb persistant client")
 def validate_collection_id(collection_id: str) -> bool:
     """Validates if a collection ID exists in ChromaDB."""
@@ -238,7 +242,7 @@ def register_main():
                     if validate_collection_id(property_id)==False:
                         return st.error("Please enter valid Property ID")
                     st.session_state.pid = property_id
-                    logging.info("property_id given to pis session variable")
+                    logging.info(f"{st.session_state.pid} given to pid session variable")
                     
                     try:
 
@@ -249,7 +253,7 @@ def register_main():
                         return (f"Enter Valid Credential {e}")
                     if user_id:
                         st.session_state.session_id = session_id  # Store session_id
-                        logging.info("session_id  given to session_id session variable")
+                        logging.info(f"{st.session_state.pid}  given to session_id session variable")
                         st.session_state.logged_in = True
                         logging.info(" logged_in session variable set to true")
                         st.sidebar.success(f"User id {user_id} Logged In Successfully!!.\nYour Session_ID: {session_id}")
@@ -278,24 +282,21 @@ def register_main():
         if user_input:
             logging.info(f"User entered {user_input}")
             response=chatbot(user_input,st.session_state.pid,st.session_state.session_id)
-            logging.info(session_id ,"is getting searched in Session_Table  ")
+            logging.info( f"{st.session_state.session_id} is getting searched in Session_Table  ")
             user = db.query(Session_Table).filter_by(session_id=st.session_state.session_id).first()
             if not user:
-                logging.info(session_id ,"is not in Session_Table  ")
+                logging.info(f"{st.session_state.session_id} is not in Session_Table  ")
                 raise HTTPException(status_code=404, detail="Enter a valid session ID")
             
-            #print(st.session_state.pid)
-            #print(st.session_state.session_id)
-            #st.write(user_input,st.session_state.pid,st.session_state.session_id)
-
+           
             message_container=f"{
          f"\n USER-> {user_input}",
         f"\n RESPONSE-> {response}"
                                 }"
-            logging.info(session_id ,"is getting searched in Chat Table..  ")
+            logging.info(f"{st.session_state.session_id} is getting searched in Chat Table..  ")
             record_search=db.query(Chat).filter_by(session_id=st.session_state.session_id).first()
             if not record_search:
-                logging.info("User with",session_id,"not found")
+                logging.info(f"{st.session_state.session_id}User with,not found")
                 first_chat=Chat(session_id=st.session_state.session_id,sender="user",message=message_container,sent_at=datetime.utcnow().strftime('%Y-%m-%d %H:%M'),status="read")
                 
                 user.ended_at = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
@@ -310,24 +311,31 @@ def register_main():
                 db.add(user)
                 db.commit()
                 db.refresh(first_chat)
+                logging.info("First time visit of user thus adding to session table.")
+                logging.info("All entries done in Chat and session table")
             else :
 
         
-                logging.info("User allready exists")
+                logging.info("User already exists")
 
                 user.ended_at = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
+                logging.info("Ended at column updated in session table")
                 record_search.message=(record_search.message or "")+message_container
+                logging.info("Message appended to existing chat in  session table")
                 record_search.sent_at=datetime.utcnow().strftime('%Y-%m-%d %H:%M')
+                logging.info("Message sended at updated in session table")
                 if user.started_at:
       
                     ended_at_dt = datetime.strptime(user.ended_at, '%Y-%m-%d %H:%M')
                     started_at_dt = datetime.strptime(user.started_at, '%Y-%m-%d %H:%M')
                     user.Duration = (ended_at_dt - started_at_dt).total_seconds()
+                    logging.info("Chat Duration updated in session table")
                 db.add(record_search)
                 db.add(user)
                 db.commit()
                 db.refresh(user)
                 db.refresh(record_search)
+                logging.info("Chnages for user done")
             with st.chat_message('user'):
                 st.write(user_input)
             st.session_state.chat_history.append({
@@ -343,5 +351,5 @@ def register_main():
                 'content': response
             })
 
-logging.info("Calling register_main function")
+
 register_main()
