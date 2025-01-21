@@ -1,7 +1,9 @@
-# Neovis-Registered-User-App
+# Neovis-App
 # Hotel Property Chatbot
 
-A Streamlit-based intelligent chatbot application that provides property-specific information to registered hotel users. The application features secure authentication, conversation management, and customer service transfer capabilities.
+A Streamlit-based intelligent chatbot application that provides property-specific information to registered hotel users & internal user. The application features secure authentication, conversation management, and customer service transfer capabilities.
+![image](https://github.com/user-attachments/assets/60c2713b-2c64-44a2-9b83-8309df29659e)
+
 
 ## Features
 
